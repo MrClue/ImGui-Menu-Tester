@@ -3,9 +3,11 @@
 #include "includes.hpp"
 #include "utils.hpp"
 
-// *** reminder
-//
-// ImColor takes "int" values ONLY!
+/* <REMINDER>
+ * 
+ * For consistency use "int" values for ImColor(), unless it must contain digits, then use "float".
+ * 
+**/
 
 namespace colors {
 
