@@ -56,8 +56,8 @@ int StartRendering( )
 
     io.WantSaveIniSettings = false;
 
-    themes::MenuTheme(); // APPLY STYLING
-    themes::MenuFonts(); // APPLY FONTS
+    menu::themes::MenuTheme(); // APPLY STYLING
+    menu::themes::MenuFonts(); // APPLY FONTS
 
     ImGui_ImplWin32_Init( hwnd );
     ImGui_ImplDX11_Init( g_pd3dDevice , g_pd3dDeviceContext );
@@ -83,7 +83,7 @@ int StartRendering( )
         ImGui::NewFrame( );
 
         menu::render::RenderMenu(); // RENDER MENU
-        
+
         ImGui::Render( );
        
         g_pd3dDeviceContext->OMSetRenderTargets( 1 , &g_mainRenderTargetView , NULL );
@@ -191,7 +191,7 @@ LRESULT WINAPI WndProc( HWND hWnd , UINT msg , WPARAM wParam , LPARAM lParam )
 //
 
 void menu::widgets::MainMenu() {
-    ImGui::SetNextWindowSize(sizes::main_menu);
+    ImGui::SetNextWindowSize(menu::sizes::main_menu);
 
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
     if (ImGui::Begin("CLUES - Counter-Strike: Global Offensive", 0, menu::flags::main_menu)) {
@@ -205,7 +205,7 @@ void menu::widgets::MainMenu() {
 }
 
 void menu::widgets::ToggleBottomBar() {
-    ImGui::SetNextWindowSize(sizes::click_to_show);
+    ImGui::SetNextWindowSize(menu::sizes::click_to_show);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 480.f));
 
     if (ImGui::Begin("Show/Hide Button", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground)) {
@@ -230,7 +230,7 @@ void menu::widgets::ToggleBottomBar() {
 }
 
 void menu::widgets::InitBottomBar() {
-    ImGui::SetNextWindowSize(sizes::bottom_bar);
+    ImGui::SetNextWindowSize(menu::sizes::bottom_bar);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 505.f));
 
     if (ImGui::Begin("Version 1 - By MrClue", 0, ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoCollapse */ | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
@@ -371,36 +371,62 @@ void menu::init_tab::ConfigsTab() {
 // SECTION: STYLING & RENDERING MENU!
 //
 
-void themes::MenuTheme() {
+void menu::themes::MenuTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // window title bar
+    // title bar
     style.WindowTitleAlign = ImVec2(0.5, 0.5);
     style.Colors[ImGuiCol_TitleBg] = colors::main;
     style.Colors[ImGuiCol_TitleBgActive] = colors::main;
     style.Colors[ImGuiCol_TitleBgCollapsed] = colors::main_less_alpha;
 
-    // border styling
+    // border
     style.WindowBorderSize = 2.0f;
     style.Colors[ImGuiCol_Border] = colors::main;
 
-    // background colors
+    // window backgrounds
     style.Colors[ImGuiCol_WindowBg] = colors::secondary;
     style.Colors[ImGuiCol_ChildBg] = colors::main;
+
+    // text
+    style.Colors[ImGuiCol_Text] = colors::text;
 
     // buttons
     style.Colors[ImGuiCol_Button] = colors::button_inactive;
     style.Colors[ImGuiCol_ButtonActive] = colors::button_active;
     style.Colors[ImGuiCol_ButtonHovered] = colors::button_hovered;
 
-    // text - imgui default is white
-    //style.Colors[ImGuiCol_Text] = colors::text_col;
+    // check-mark
+    style.Colors[ImGuiCol_CheckMark] = ImColor(218, 83, 95, 255);
+
+    // header
+    style.Colors[ImGuiCol_Header] = ImColor(218, 83, 95, 27);
+    style.Colors[ImGuiCol_HeaderHovered] = ImColor(218, 83, 95, 62);
+    style.Colors[ImGuiCol_HeaderActive] = ImColor(218, 83, 95, 143);
+
+    // popup
+    style.Colors[ImGuiCol_PopupBg] = ImColor(218, 83, 95, 27);
 
     // frame
-    /*style.FramePadding = ImVec2(8, 6);*/ // ser lidt grimt ud
+    style.Colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
+    style.Colors[ImGuiCol_FrameBgHovered] = ImColor(218, 83, 95, 62);
+    style.Colors[ImGuiCol_FrameBgActive] = ImColor(218, 83, 95, 143);
+    style.FrameRounding = 2;
+
+    // sliders
+    style.GrabMinSize = 10;
+    style.GrabRounding = 2;
+    style.Colors[ImGuiCol_SliderGrab] = ImColor(218, 83, 95, 255);
+    style.Colors[ImGuiCol_SliderGrabActive] = ImColor(218, 83, 95, 255);
+
+    // scrollbar
+    style.ScrollbarSize = 10;
+    style.Colors[ImGuiCol_ScrollbarGrab] = ImColor(218, 83, 95, 143);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(218, 83, 95, 176);
+    style.Colors[ImGuiCol_ScrollbarGrabActive] = ImColor(218, 83, 95, 195);
 }
 
-void themes::MenuFonts() {
+void menu::themes::MenuFonts() {
     ImGuiIO& io = ImGui::GetIO();
 
     io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 15.0f); // default
@@ -410,6 +436,9 @@ void themes::MenuFonts() {
 }
 
 void menu::render::RenderMenu() {
+    // ImGui demo window
+    //ImGui::ShowDemoWindow();
+
     // window: main menu
     menu::widgets::MainMenu();
 
