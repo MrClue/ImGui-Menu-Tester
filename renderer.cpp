@@ -1,5 +1,4 @@
-#include "includes.hpp"
-#include "utils.hpp"
+#include "renderer.h"
 
 static ID3D11Device           * g_pd3dDevice           = nullptr;
 static ID3D11DeviceContext    * g_pd3dDeviceContext    = nullptr;
@@ -12,46 +11,39 @@ void CreateRenderTarget( );
 void CleanupRenderTarget( );
 LRESULT __stdcall WndProc( HWND, UINT , WPARAM, LPARAM );
 
-// style of menu
-ImColor main_col = ImColor(41, 31, 57);
-ImColor main_col_less_alpha = ImColor(41, 31, 57, 225);
-
-ImColor secondary_col = ImColor(63, 52, 83);
-
-ImVec4 buttonActive = ImColor(41, 31, 57, 255);
-ImVec4 buttonInactive = ImColor(24, 17, 41, 255);
-ImVec4 buttonHovered = ImColor(30, 23, 47, 255);
-
-void MenuTheme() {
+void theme::MenuTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
 
     // window size
     //style.WindowMinSize = ImVec2(600, 500);
-
+    
     // window title bar
     style.WindowTitleAlign = ImVec2(0.5, 0.5);
-    style.Colors[ImGuiCol_TitleBg] = main_col;
-    style.Colors[ImGuiCol_TitleBgActive] = main_col;
-    style.Colors[ImGuiCol_TitleBgCollapsed] = main_col_less_alpha;
+    style.Colors[ImGuiCol_TitleBg] = colors::main_col;
+    style.Colors[ImGuiCol_TitleBgActive] = colors::main_col;
+    style.Colors[ImGuiCol_TitleBgCollapsed] = colors::main_col_less_alpha;
 
     /*style.FramePadding = ImVec2(8, 6);*/ // ser lidt grimt ud
 
     // border styling
     style.WindowBorderSize = 2.0f;
-    style.Colors[ImGuiCol_Border] = main_col; // border
+    style.Colors[ImGuiCol_Border] = colors::main_col; // border
 
     // background colors
-    style.Colors[ImGuiCol_WindowBg] = secondary_col;
-    style.Colors[ImGuiCol_ChildBg] = main_col; // child
+    style.Colors[ImGuiCol_WindowBg] = colors::secondary_col;
+    style.Colors[ImGuiCol_ChildBg] = colors::main_col; // child
 
     // buttons
-    style.Colors[ImGuiCol_Button] = buttonInactive;
-    style.Colors[ImGuiCol_ButtonActive] = buttonActive;
-    style.Colors[ImGuiCol_ButtonHovered] = buttonHovered;
+    style.Colors[ImGuiCol_Button] = colors::buttonInactive;
+    style.Colors[ImGuiCol_ButtonActive] = colors::buttonActive;
+    style.Colors[ImGuiCol_ButtonHovered] = colors::buttonHovered;
+
+    // text
+    //style.Colors[ImGuiCol_Text] = colors::text_col;
  
 }
 
-void MenuFont() {
+void theme::MenuFonts() {
     ImGuiIO& io = ImGui::GetIO(); 
 
     io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 15.0f); // default
@@ -105,8 +97,8 @@ int StartRendering( )
 
     io.WantSaveIniSettings = false;
 
-    MenuTheme(); // set menu styling
-    MenuFont();
+    theme::MenuTheme(); // apply menu styling
+    theme::MenuFonts(); // apply menu fonts
 
     ImGui_ImplWin32_Init( hwnd );
     ImGui_ImplDX11_Init( g_pd3dDevice , g_pd3dDeviceContext );
@@ -131,7 +123,7 @@ int StartRendering( )
         ImGui_ImplWin32_NewFrame( );
         ImGui::NewFrame( );
 
-        { // MENU CODE HERE
+        { // ---> MENU CODE HERE <---
 
             // setting dummy vars
             static bool dummy_bool = false;
@@ -148,56 +140,52 @@ int StartRendering( )
             // for selecting tabs
             static int selectedTab = 0;
 
-            // GHETTO PLS FIX LATER!
-            //ImGuiIO& io = ImGui::GetIO();
-            //ImFont* titleBar = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 18.0f);
-            // -------------------
-
             // main window
 
-            ImGui::SetNextWindowSize(ImVec2(600, 500));
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 8));
-            //ImGui::PushFont(titleBar);
+            ImGui::SetNextWindowSize(ImVec2(600.f, 500.f));
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
+            
             if (ImGui::Begin("CLUES - Counter-Strike: Global Offensive", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus)) {
-                //ImGui::PopFont();
+                
                 ImGui::PopStyleVar();
 
                 menuPos = ImGui::GetWindowPos(); // grab window position
 
-                ImGui::PushStyleColor(ImGuiCol_Border, ImColor(74, 65, 95).Value);
+                ImGui::PushStyleColor(ImGuiCol_Border, colors::border_col);
 
-                if (ImGui::BeginChild("##Tabs", ImVec2(ImGui::GetContentRegionAvail().x, 50), true)) {
-                    int tabs = 5;
+                if (ImGui::BeginChild("##Tabs", ImVec2(ImGui::GetContentRegionAvail().x, 50.f), true)) {
+                    
+                    int tabs = 5; // = [aimbot, visuals, misc, skins, configs]
                     float tabSpacing = 2.0f;
                     float tabSizeX = (ImGui::GetContentRegionAvail().x / tabs) - tabSpacing;
                     float tabSizeY = ImGui::GetContentRegionAvail().y;
 
                     
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 0 ? buttonActive : buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 0 ? colors::buttonActive : colors::buttonInactive);
                     if (ImGui::Button("Aimbot", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 0;
                     }
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 1 ? buttonActive : buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 1 ? colors::buttonActive : colors::buttonInactive);
                     if (ImGui::Button("Visuals", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 1;
                     }
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 2 ? buttonActive : buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 2 ? colors::buttonActive : colors::buttonInactive);
                     if (ImGui::Button("Misc", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 2;
                     }
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 3 ? buttonActive : buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 3 ? colors::buttonActive : colors::buttonInactive);
                     if (ImGui::Button("Skins", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 3;
                     }
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 4 ? buttonActive : buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 4 ? colors::buttonActive : colors::buttonInactive);
                     if (ImGui::Button("Configs", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 4;
                     }
@@ -208,14 +196,14 @@ int StartRendering( )
 
                 ImGui::PopStyleColor();
                 
-                ImGui::PushStyleColor(ImGuiCol_Border, ImColor(74, 65, 95).Value);
+                ImGui::PushStyleColor(ImGuiCol_Border, colors::border_col);
 
                 if (ImGui::BeginChild("##ActiveTab", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), true)) {
                     switch (selectedTab)
                     {
                     case 0: // aimbot
                         ImGui::Checkbox("Enable Aimbot", &dummy_bool);
-                        ImGui::SliderInt("FOV", &dummy_int, 0, 100.f);
+                        ImGui::SliderInt("FOV", &dummy_int, 0, 100);
                         ImGui::SliderFloat("Speed", &dummy_float, 0.f, 100.f);
 
                         if (ImGui::BeginCombo("Bone", " ")) {
@@ -269,22 +257,18 @@ int StartRendering( )
             } ImGui::End();
 
             // show/hide button
-            ImGui::SetNextWindowSize(ImVec2(/*80*/600.f, 50.f));
-            ImGui::SetNextWindowPos(ImVec2(menuPos.x /* + 280*/, menuPos.y + 480));
+            ImGui::SetNextWindowSize(ImVec2(600.f, 50.f));
+            ImGui::SetNextWindowPos(ImVec2(menuPos.x, menuPos.y + 480.f));
             if (ImGui::Begin("Show/Hide Button", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground)) {
 
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0.0001));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0.0001));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0.0001));
-
-                /*if (ImGui::ArrowButton("bottom-bar toggle", ImGuiDir_::ImGuiDir_Down)) {
-                    showBotBar = !showBotBar;
-                }*/
+                ImGui::PushStyleColor(ImGuiCol_Button, colors::hidden);
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, colors::hidden);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colors::hidden);
 
                 // make "click" hide on click
                 if (showBotBar == true) {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 255, 255, 0.0001));
-                } else ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 255, 255, 255));
+                    ImGui::PushStyleColor(ImGuiCol_Text, colors::hidden);
+                } else ImGui::PushStyleColor(ImGuiCol_Text, colors::text_col);
 
                 if (ImGui::Button("click", ImVec2(ImGui::GetContentRegionAvailWidth(), ImGui::GetWindowHeight()))) {
                     showBotBar = !showBotBar;
@@ -296,17 +280,16 @@ int StartRendering( )
 
             // bottom-bar
             if (showBotBar) {
-                ImGui::SetNextWindowSize(ImVec2(600, 58));
-                ImGui::SetNextWindowPos(ImVec2(menuPos.x, menuPos.y + 505));
+                ImGui::SetNextWindowSize(ImVec2(600.f, 58.f));
+                ImGui::SetNextWindowPos(ImVec2(menuPos.x, menuPos.y + 505.f));
 
                 if (ImGui::Begin("Version 1 - By MrClue", 0, ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoCollapse */ | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
 
                     ImGui::Text("Status: ");
                     ImGui::SameLine(0.f, 0.f);
-                    ImGui::TextColored(ImColor(0, 215, 0), "Undectected");
+                    ImGui::TextColored(colors::status_undetected, "Undectected");
                     ImGui::SameLine(0.f, 0.f);
                     ImGui::Text(".");
-                    
                     
                 } ImGui::End(); 
                 
