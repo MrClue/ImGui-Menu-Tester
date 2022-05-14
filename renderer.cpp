@@ -261,18 +261,6 @@ int StartRendering( )
                     case 4: // configs
                         break;
                     }
-                    
-                    // show/hide bottom-bar
-                    // ---- 
-                    /*
-                    ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() / 2, (ImGui::GetWindowHeight() / 2) + 165));
-                    ImGui::PushStyleColor(ImGuiCol_Button, buttonActive);
-                    if (ImGui::ArrowButton("bar", ImGuiDir_::ImGuiDir_Down)) {
-                        showBotBar = !showBotBar;
-                    }
-                    ImGui::PopStyleColor();
-                    */
-                    // ----
 
                 } ImGui::EndChild();
                 
