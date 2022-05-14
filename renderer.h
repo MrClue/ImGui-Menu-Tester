@@ -46,3 +46,52 @@ namespace sizes {
 	ImVec2 bottom_bar = ImVec2(600.f, 58.f);		// bottom-bar
 
 }
+
+namespace menu {
+	// menu vars
+	ImVec2 main_menu_position;
+	bool showBotBar = false;
+
+	// menu tabs
+	int tabs = 5; // = [aimbot, visuals, misc, skins, configs]
+	int selectedTab = 0;
+	float tabSpacing = 2.f;
+	
+	namespace render {
+		void RenderMenu();
+	}
+
+	namespace flags {
+		auto main_menu = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
+	}
+
+	namespace navbar {
+		void TabNavigation();
+		void TabContent();
+	}
+
+	namespace widgets {
+		void MainMenu();
+		void ToggleBottomBar();
+		void InitBottomBar();
+	}
+
+	namespace init_tab {
+		void AimbotTab();
+		void VisualsTab();
+		void MiscTab();
+		void SkinsTab();
+		void ConfigsTab();
+	}
+}
+
+namespace settings {
+	// setting dummy vars
+	bool dummy_bool = false;
+	float dummy_float = 0.f;
+	int dummy_int = 0;
+
+	const char* aimBones[]{ "Head", "Chest", "Stomach" };
+	int selectedBone = 0;
+	int selected[3]{};
+}
