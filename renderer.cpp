@@ -11,39 +11,36 @@ void CreateRenderTarget( );
 void CleanupRenderTarget( );
 LRESULT __stdcall WndProc( HWND, UINT , WPARAM, LPARAM );
 
-void theme::MenuTheme() {
+void themes::MenuTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // window size
-    //style.WindowMinSize = ImVec2(600, 500);
-    
     // window title bar
     style.WindowTitleAlign = ImVec2(0.5, 0.5);
-    style.Colors[ImGuiCol_TitleBg] = colors::main_col;
-    style.Colors[ImGuiCol_TitleBgActive] = colors::main_col;
-    style.Colors[ImGuiCol_TitleBgCollapsed] = colors::main_col_less_alpha;
-
-    /*style.FramePadding = ImVec2(8, 6);*/ // ser lidt grimt ud
+    style.Colors[ImGuiCol_TitleBg] = colors::main;
+    style.Colors[ImGuiCol_TitleBgActive] = colors::main;
+    style.Colors[ImGuiCol_TitleBgCollapsed] = colors::main_less_alpha;
 
     // border styling
     style.WindowBorderSize = 2.0f;
-    style.Colors[ImGuiCol_Border] = colors::main_col; // border
+    style.Colors[ImGuiCol_Border] = colors::main;
 
     // background colors
-    style.Colors[ImGuiCol_WindowBg] = colors::secondary_col;
-    style.Colors[ImGuiCol_ChildBg] = colors::main_col; // child
+    style.Colors[ImGuiCol_WindowBg] = colors::secondary;
+    style.Colors[ImGuiCol_ChildBg] = colors::main;
 
     // buttons
-    style.Colors[ImGuiCol_Button] = colors::buttonInactive;
-    style.Colors[ImGuiCol_ButtonActive] = colors::buttonActive;
-    style.Colors[ImGuiCol_ButtonHovered] = colors::buttonHovered;
+    style.Colors[ImGuiCol_Button] = colors::button_inactive;
+    style.Colors[ImGuiCol_ButtonActive] = colors::button_active;
+    style.Colors[ImGuiCol_ButtonHovered] = colors::button_hovered;
 
-    // text
+    // text - imgui default is white
     //style.Colors[ImGuiCol_Text] = colors::text_col;
  
+    // frame
+    /*style.FramePadding = ImVec2(8, 6);*/ // ser lidt grimt ud
 }
 
-void theme::MenuFonts() {
+void themes::MenuFonts() {
     ImGuiIO& io = ImGui::GetIO(); 
 
     io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 15.0f); // default
@@ -97,8 +94,8 @@ int StartRendering( )
 
     io.WantSaveIniSettings = false;
 
-    theme::MenuTheme(); // apply menu styling
-    theme::MenuFonts(); // apply menu fonts
+    themes::MenuTheme(); // apply menu styling
+    themes::MenuFonts(); // apply menu fonts
 
     ImGui_ImplWin32_Init( hwnd );
     ImGui_ImplDX11_Init( g_pd3dDevice , g_pd3dDeviceContext );
@@ -129,6 +126,7 @@ int StartRendering( )
             static bool dummy_bool = false;
             static float dummy_float = 0.f;
             static int dummy_int = 0;
+
             static const char* aimBones[]{ "Head", "Chest", "Stomach" };
             static int selectedBone = 0;
             static int selected[3]{};
@@ -136,68 +134,64 @@ int StartRendering( )
             // menu vars
             static ImVec2 menuPos;
             static bool showBotBar = false;
-            
-            // for selecting tabs
             static int selectedTab = 0;
 
-            // main window
+            // <main menu>
 
-            ImGui::SetNextWindowSize(ImVec2(600.f, 500.f));
+            ImGui::SetNextWindowSize(sizes::main_menu);
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
-            
             if (ImGui::Begin("CLUES - Counter-Strike: Global Offensive", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus)) {
-                
                 ImGui::PopStyleVar();
 
                 menuPos = ImGui::GetWindowPos(); // grab window position
 
-                ImGui::PushStyleColor(ImGuiCol_Border, colors::border_col);
-
+                ImGui::PushStyleColor(ImGuiCol_Border, colors::border);
                 if (ImGui::BeginChild("##Tabs", ImVec2(ImGui::GetContentRegionAvail().x, 50.f), true)) {
                     
                     int tabs = 5; // = [aimbot, visuals, misc, skins, configs]
-                    float tabSpacing = 2.0f;
+                    float tabSpacing = 2.f;
                     float tabSizeX = (ImGui::GetContentRegionAvail().x / tabs) - tabSpacing;
                     float tabSizeY = ImGui::GetContentRegionAvail().y;
 
-                    
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 0 ? colors::buttonActive : colors::buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 0 ? colors::button_active : colors::button_inactive);
                     if (ImGui::Button("Aimbot", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 0;
                     }
+
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 1 ? colors::buttonActive : colors::buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 1 ? colors::button_active : colors::button_inactive);
                     if (ImGui::Button("Visuals", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 1;
                     }
+
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 2 ? colors::buttonActive : colors::buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 2 ? colors::button_active : colors::button_inactive);
                     if (ImGui::Button("Misc", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 2;
                     }
+
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 3 ? colors::buttonActive : colors::buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 3 ? colors::button_active : colors::button_inactive);
                     if (ImGui::Button("Skins", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 3;
                     }
+
                     ImGui::SameLine(0.f, tabSpacing);
 
-                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 4 ? colors::buttonActive : colors::buttonInactive);
+                    ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == 4 ? colors::button_active : colors::button_inactive);
                     if (ImGui::Button("Configs", ImVec2(tabSizeX, tabSizeY))) {
                         selectedTab = 4;
                     }
 
-                    ImGui::PopStyleColor(5);
+                    ImGui::PopStyleColor(5); // for each tab
 
                 } ImGui::EndChild(); 
-
-                ImGui::PopStyleColor();
+                ImGui::PopStyleColor(); // for child: ##tabs
                 
-                ImGui::PushStyleColor(ImGuiCol_Border, colors::border_col);
-
+                ImGui::PushStyleColor(ImGuiCol_Border, colors::border);
                 if (ImGui::BeginChild("##ActiveTab", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), true)) {
                     switch (selectedTab)
                     {
@@ -251,13 +245,12 @@ int StartRendering( )
                     }
 
                 } ImGui::EndChild();
-                
-                ImGui::PopStyleColor();
+                ImGui::PopStyleColor(); // for child: ##ActiveTab
 
             } ImGui::End();
 
             // show/hide button
-            ImGui::SetNextWindowSize(ImVec2(600.f, 50.f));
+            ImGui::SetNextWindowSize(sizes::click_to_show);
             ImGui::SetNextWindowPos(ImVec2(menuPos.x, menuPos.y + 480.f));
             if (ImGui::Begin("Show/Hide Button", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground)) {
 
@@ -268,19 +261,19 @@ int StartRendering( )
                 // make "click" hide on click
                 if (showBotBar == true) {
                     ImGui::PushStyleColor(ImGuiCol_Text, colors::hidden);
-                } else ImGui::PushStyleColor(ImGuiCol_Text, colors::text_col);
+                } else ImGui::PushStyleColor(ImGuiCol_Text, colors::text);
 
                 if (ImGui::Button("click", ImVec2(ImGui::GetContentRegionAvailWidth(), ImGui::GetWindowHeight()))) {
                     showBotBar = !showBotBar;
                 }
 
-                ImGui::PopStyleColor(4);
+                ImGui::PopStyleColor(4); // click-btn styles
                 
             } ImGui::End();
 
             // bottom-bar
             if (showBotBar) {
-                ImGui::SetNextWindowSize(ImVec2(600.f, 58.f));
+                ImGui::SetNextWindowSize(sizes::bottom_bar);
                 ImGui::SetNextWindowPos(ImVec2(menuPos.x, menuPos.y + 505.f));
 
                 if (ImGui::Begin("Version 1 - By MrClue", 0, ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoCollapse */ | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
