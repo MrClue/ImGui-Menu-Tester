@@ -34,7 +34,7 @@ void MenuTheme() {
     style.Colors[ImGuiCol_TitleBgActive] = main_col;
     style.Colors[ImGuiCol_TitleBgCollapsed] = main_col_less_alpha;
 
-    //style.FramePadding = ImVec2(8, 6);
+    /*style.FramePadding = ImVec2(8, 6);*/ // ser lidt grimt ud
 
     // border styling
     style.WindowBorderSize = 2.0f;
@@ -280,10 +280,17 @@ int StartRendering( )
                 /*if (ImGui::ArrowButton("bottom-bar toggle", ImGuiDir_::ImGuiDir_Down)) {
                     showBotBar = !showBotBar;
                 }*/
+
+                // make "click" hide on click
+                if (showBotBar == true) {
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 255, 255, 0.0001));
+                } else ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 255, 255, 255));
+
                 if (ImGui::Button("click", ImVec2(ImGui::GetContentRegionAvailWidth(), ImGui::GetWindowHeight()))) {
                     showBotBar = !showBotBar;
                 }
-                ImGui::PopStyleColor(3);
+
+                ImGui::PopStyleColor(4);
                 
             } ImGui::End();
 
