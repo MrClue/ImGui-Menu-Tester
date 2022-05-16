@@ -29,18 +29,36 @@ namespace colors {
 	// cheat status
 	ImVec4 status_undetected = ImColor(0, 215, 0, 255);
 	ImVec4 statis_detected = ImColor(215, 0, 0, 255);
-
 }
 
 namespace menu {
 	
 	ImVec2 main_menu_position;
+
 	bool showBotBar = false;
+	bool isDetected = false;	// is cheat VAC detected?
 
 	int tabs = 5;				// [aimbot, visuals, misc, skins, configs]
 	int selectedTab = 0;		// switch-statement
 	float tabSpacing = 2.f;		// spacing between tabs
 	
+	namespace sizes {
+		ImVec2 main_menu = ImVec2(600.f, 500.f);		// main-menu
+		ImVec2 click_to_show = ImVec2(600.f, 50.f);		// "click" button
+		ImVec2 bottom_bar = ImVec2(600.f, 58.f);		// bottom-bar
+	}
+
+	namespace fonts {
+		ImFont* defaultFont;
+		ImFont* titleFont;
+	}
+
+	namespace flags {
+		auto main_menu = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
+		auto click_to_show = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
+		auto bottom_bar = ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoCollapse */ | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar;
+	}
+
 	namespace render {
 		void RenderMenu();
 	}
@@ -48,7 +66,6 @@ namespace menu {
 	namespace themes {
 		void MenuTheme();
 		void MenuFonts();
-
 	}
 
 	namespace navbar {
@@ -68,17 +85,6 @@ namespace menu {
 		void MiscTab();
 		void SkinsTab();
 		void ConfigsTab();
-	}
-
-	namespace sizes {
-		ImVec2 main_menu = ImVec2(600.f, 500.f);		// main-menu
-		ImVec2 click_to_show = ImVec2(600.f, 50.f);		// "click" button
-		ImVec2 bottom_bar = ImVec2(600.f, 58.f);		// bottom-bar
-
-	}
-
-	namespace flags {
-		auto main_menu = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
 	}
 
 }

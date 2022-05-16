@@ -1,4 +1,4 @@
-#include "renderer.h"
+#include "menu.h"
 
 static ID3D11Device           * g_pd3dDevice           = nullptr;
 static ID3D11DeviceContext    * g_pd3dDeviceContext    = nullptr;
@@ -57,7 +57,6 @@ int StartRendering( )
     io.WantSaveIniSettings = false;
 
     menu::themes::MenuTheme(); // APPLY STYLING
-    menu::themes::MenuFonts(); // APPLY FONTS
 
     ImGui_ImplWin32_Init( hwnd );
     ImGui_ImplDX11_Init( g_pd3dDevice , g_pd3dDeviceContext );
@@ -191,24 +190,34 @@ LRESULT WINAPI WndProc( HWND hWnd , UINT msg , WPARAM wParam , LPARAM lParam )
 //
 
 void menu::widgets::MainMenu() {
-    ImGui::SetNextWindowSize(menu::sizes::main_menu);
+    ImGui::PushFont(menu::fonts::titleFont); // apply title font
 
+    ImGui::SetNextWindowSize(menu::sizes::main_menu);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
     if (ImGui::Begin("CLUES - Counter-Strike: Global Offensive", 0, menu::flags::main_menu)) {
         ImGui::PopStyleVar();
-
+        
         menu::main_menu_position = ImGui::GetWindowPos(); // grab window position
+        
+        ImGui::PushFont(menu::fonts::defaultFont); // apply default font
 
         menu::navbar::TabNavigation();
         menu::navbar::TabContent();
+
+        ImGui::PopFont(); // default font
+
     } ImGui::End();
+    
+    ImGui::PopFont(); // title font
 }
 
 void menu::widgets::ToggleBottomBar() {
+    ImGui::PushFont(menu::fonts::defaultFont);
+
     ImGui::SetNextWindowSize(menu::sizes::click_to_show);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 480.f));
 
-    if (ImGui::Begin("Show/Hide Button", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground)) {
+    if (ImGui::Begin("Show/Hide Button", 0, menu::flags::click_to_show)) {
 
         ImGui::PushStyleColor(ImGuiCol_Button, colors::hidden);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, colors::hidden);
@@ -227,21 +236,29 @@ void menu::widgets::ToggleBottomBar() {
         ImGui::PopStyleColor(4); // click-btn styles
 
     } ImGui::End();
+
+    ImGui::PopFont();
 }
 
 void menu::widgets::InitBottomBar() {
+    ImGui::PushFont(menu::fonts::defaultFont);
+
     ImGui::SetNextWindowSize(menu::sizes::bottom_bar);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 505.f));
 
-    if (ImGui::Begin("Version 1 - By MrClue", 0, ImGuiWindowFlags_NoResize /* | ImGuiWindowFlags_NoCollapse */ | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar)) {
+    if (ImGui::Begin("Version 1 - By MrClue", 0, menu::flags::bottom_bar)) {
 
         ImGui::Text("Status: ");
         ImGui::SameLine(0.f, 0.f);
-        ImGui::TextColored(colors::status_undetected, "Undectected");
+        if (!menu::isDetected) {
+            ImGui::TextColored(colors::status_undetected, "Undectected");
+        } else ImGui::TextColored(colors::statis_detected, "Detected");
         ImGui::SameLine(0.f, 0.f);
         ImGui::Text(".");
 
     } ImGui::End();
+
+    ImGui::PopFont();
 }
 
 void menu::navbar::TabNavigation() {
@@ -370,69 +387,71 @@ void menu::init_tab::ConfigsTab() {
 //
 // SECTION: STYLING & RENDERING MENU!
 //
+void menu::themes::MenuFonts() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    menu::fonts::defaultFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 15.0f);
+    menu::fonts::titleFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 18.0f);
+
+}
 
 void menu::themes::MenuTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
+    auto colors = style.Colors;
 
     // title bar
     style.WindowTitleAlign = ImVec2(0.5, 0.5);
-    style.Colors[ImGuiCol_TitleBg] = colors::main;
-    style.Colors[ImGuiCol_TitleBgActive] = colors::main;
-    style.Colors[ImGuiCol_TitleBgCollapsed] = colors::main_less_alpha;
+    colors[ImGuiCol_TitleBg] = colors::main;
+    colors[ImGuiCol_TitleBgActive] = colors::main;
+    colors[ImGuiCol_TitleBgCollapsed] = colors::main_less_alpha;
 
     // border
     style.WindowBorderSize = 2.0f;
-    style.Colors[ImGuiCol_Border] = colors::main;
+    colors[ImGuiCol_Border] = colors::main;
 
     // window backgrounds
-    style.Colors[ImGuiCol_WindowBg] = colors::secondary;
-    style.Colors[ImGuiCol_ChildBg] = colors::main;
+    colors[ImGuiCol_WindowBg] = colors::secondary;
+    colors[ImGuiCol_ChildBg] = colors::main;
 
     // text
-    style.Colors[ImGuiCol_Text] = colors::text;
+    colors[ImGuiCol_Text] = colors::text;
 
     // buttons
-    style.Colors[ImGuiCol_Button] = colors::button_inactive;
-    style.Colors[ImGuiCol_ButtonActive] = colors::button_active;
-    style.Colors[ImGuiCol_ButtonHovered] = colors::button_hovered;
+    colors[ImGuiCol_Button] = colors::button_inactive;
+    colors[ImGuiCol_ButtonActive] = colors::button_active;
+    colors[ImGuiCol_ButtonHovered] = colors::button_hovered;
 
     // check-mark
-    style.Colors[ImGuiCol_CheckMark] = ImColor(218, 83, 95, 255);
+    colors[ImGuiCol_CheckMark] = ImColor(218, 83, 95, 255);
 
     // header
-    style.Colors[ImGuiCol_Header] = ImColor(218, 83, 95, 27);
-    style.Colors[ImGuiCol_HeaderHovered] = ImColor(218, 83, 95, 62);
-    style.Colors[ImGuiCol_HeaderActive] = ImColor(218, 83, 95, 143);
+    colors[ImGuiCol_Header] = ImColor(218, 83, 95, 27);
+    colors[ImGuiCol_HeaderHovered] = ImColor(218, 83, 95, 62);
+    colors[ImGuiCol_HeaderActive] = ImColor(218, 83, 95, 143);
 
     // popup
-    style.Colors[ImGuiCol_PopupBg] = ImColor(218, 83, 95, 27);
+    colors[ImGuiCol_PopupBg] = ImColor(218, 83, 95, 27);
 
     // frame
-    style.Colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
-    style.Colors[ImGuiCol_FrameBgHovered] = ImColor(218, 83, 95, 62);
-    style.Colors[ImGuiCol_FrameBgActive] = ImColor(218, 83, 95, 143);
+    colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
+    colors[ImGuiCol_FrameBgHovered] = ImColor(218, 83, 95, 62);
+    colors[ImGuiCol_FrameBgActive] = ImColor(218, 83, 95, 143);
     style.FrameRounding = 2;
 
     // sliders
     style.GrabMinSize = 10;
     style.GrabRounding = 2;
-    style.Colors[ImGuiCol_SliderGrab] = ImColor(218, 83, 95, 255);
-    style.Colors[ImGuiCol_SliderGrabActive] = ImColor(218, 83, 95, 255);
+    colors[ImGuiCol_SliderGrab] = ImColor(218, 83, 95, 255);
+    colors[ImGuiCol_SliderGrabActive] = ImColor(218, 83, 95, 255);
 
     // scrollbar
     style.ScrollbarSize = 10;
-    style.Colors[ImGuiCol_ScrollbarGrab] = ImColor(218, 83, 95, 143);
-    style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(218, 83, 95, 176);
-    style.Colors[ImGuiCol_ScrollbarGrabActive] = ImColor(218, 83, 95, 195);
-}
+    colors[ImGuiCol_ScrollbarGrab] = ImColor(218, 83, 95, 143);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(218, 83, 95, 176);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImColor(218, 83, 95, 195);
 
-void menu::themes::MenuFonts() {
-    ImGuiIO& io = ImGui::GetIO();
-
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 15.0f); // default
-
-    //ImFont* titleBar = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\LeelaUIb.ttf", 18.0f);
-
+    // load fonts
+    menu::themes::MenuFonts();
 }
 
 void menu::render::RenderMenu() {
