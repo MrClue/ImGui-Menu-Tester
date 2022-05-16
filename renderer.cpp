@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "settings.h"
 
 static ID3D11Device           * g_pd3dDevice           = nullptr;
 static ID3D11DeviceContext    * g_pd3dDeviceContext    = nullptr;
@@ -48,6 +49,8 @@ int StartRendering( )
     UpdateWindow( hwnd );
 
     ImGui::CreateContext( );
+    
+    menu::themes::MenuTheme(); // APPLY STYLING
 
     ImGuiIO& io = ImGui::GetIO( ); 
 
@@ -56,7 +59,7 @@ int StartRendering( )
 
     io.WantSaveIniSettings = false;
 
-    menu::themes::MenuTheme(); // APPLY STYLING
+    //menu::themes::MenuTheme(); // APPLY STYLING
 
     ImGui_ImplWin32_Init( hwnd );
     ImGui_ImplDX11_Init( g_pd3dDevice , g_pd3dDeviceContext );
@@ -334,14 +337,14 @@ void menu::navbar::TabContent() {
 }
 
 void menu::init_tab::AimbotTab() {
-    ImGui::Checkbox("Enable Aimbot", &settings::dummy_bool);
-    ImGui::SliderInt("FOV", &settings::dummy_int, 0, 100);
-    ImGui::SliderFloat("Speed", &settings::dummy_float, 0.f, 100.f);
+    ImGui::Checkbox("Enable Aimbot", &settings::aimbot::enable_aimbot);
+    ImGui::SliderFloat("FOV", &settings::aimbot::fov, 0.f, 100.f, "%.1f");
+    ImGui::SliderFloat("Speed", &settings::aimbot::speed, 0.f, 100.f, "%.1f");
 
-    if (ImGui::BeginCombo("Bone", " ")) {
-        for (size_t i = 0; i < IM_ARRAYSIZE(settings::aimBones); i++)
+    if (ImGui::BeginCombo("Bones", " ")) {
+        for (size_t i = 0; i < IM_ARRAYSIZE(settings::aimbot::bones); i++)
         {
-            ImGui::Selectable(settings::aimBones[i], &settings::selected[i], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups);
+            ImGui::Selectable(settings::aimbot::bones[i], &settings::aimbot::selected_array[i], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups);
         }
 
         ImGui::EndCombo();
@@ -362,7 +365,7 @@ void menu::init_tab::VisualsTab() {
 
 void menu::init_tab::MiscTab() {
     if (ImGui::BeginChild(1, ImVec2(100.f, 100.f))) {
-        ImGui::Checkbox("Enable Bhop", &settings::dummy_bool);
+        ImGui::Checkbox("Enable Bhop", &settings::misc::enable_bhop);
         ImGui::Button("Dummy 2");
 
         ImGui::EndChild();
@@ -422,7 +425,7 @@ void menu::themes::MenuTheme() {
     colors[ImGuiCol_ButtonHovered] = colors::button_hovered;
 
     // check-mark
-    colors[ImGuiCol_CheckMark] = ImColor(218, 83, 95, 255);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
 
     // header
     colors[ImGuiCol_Header] = ImColor(218, 83, 95, 27);
@@ -435,20 +438,20 @@ void menu::themes::MenuTheme() {
     // frame
     colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
     colors[ImGuiCol_FrameBgHovered] = ImColor(218, 83, 95, 62);
-    colors[ImGuiCol_FrameBgActive] = ImColor(218, 83, 95, 143);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.24f);
     style.FrameRounding = 2;
 
     // sliders
     style.GrabMinSize = 10;
     style.GrabRounding = 2;
-    colors[ImGuiCol_SliderGrab] = ImColor(218, 83, 95, 255);
-    colors[ImGuiCol_SliderGrabActive] = ImColor(218, 83, 95, 255);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.85f, 0.33f, 0.37f, 0.59f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
 
     // scrollbar
     style.ScrollbarSize = 10;
-    colors[ImGuiCol_ScrollbarGrab] = ImColor(218, 83, 95, 143);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(218, 83, 95, 176);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImColor(218, 83, 95, 195);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.85f, 0.33f, 0.37f, 0.59f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
 
     // load fonts
     menu::themes::MenuFonts();
@@ -457,6 +460,7 @@ void menu::themes::MenuTheme() {
 void menu::render::RenderMenu() {
     // ImGui demo window
     //ImGui::ShowDemoWindow();
+    //ImGui::ShowStyleEditor();
 
     // window: main menu
     menu::widgets::MainMenu();
@@ -469,3 +473,5 @@ void menu::render::RenderMenu() {
         menu::widgets::InitBottomBar();
     }
 }
+
+

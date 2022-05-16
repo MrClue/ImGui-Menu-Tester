@@ -88,14 +88,3 @@ namespace menu {
 	}
 
 }
-
-namespace settings {
-	// setting dummy vars
-	bool dummy_bool = false;
-	float dummy_float = 0.f;
-	int dummy_int = 0;
-
-	const char* aimBones[]{ "Head", "Chest", "Stomach" };
-	int selectedBone = 0;
-	int selected[3]{};
-}
