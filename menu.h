@@ -11,20 +11,22 @@
 **/
 
 namespace colors {
+	
+	ImVec4 light_purple = ImColor(41, 31, 56, 255);
+	ImVec4 light_purple_reduced_alpha = ImColor(41, 31, 56, 200);
 
-	ImVec4 main = ImColor(41, 31, 57, 255);
-	ImVec4 main_less_alpha = ImColor(41, 31, 57, 225);
+	ImVec4 dark_purple = ImColor(31, 21, 46, 255); // dark
 
-	ImVec4 secondary = ImColor(63, 52, 83, 255);
+	ImVec4 button_active = light_purple;
+	ImVec4 button_inactive = ImColor(25, 17, 40, 255);
+	ImVec4 button_hovered = ImColor(31, 21, 46, 200);
 
-	ImVec4 button_active = ImColor(41, 31, 57, 255);
-	ImVec4 button_inactive = ImColor(24, 17, 41, 255);
-	ImVec4 button_hovered = ImColor(30, 23, 47, 255);
-
-	ImVec4 border = ImColor(74, 65, 95, 255);
+	ImVec4 border = ImColor(59, 49, 74, 255); //ImColor(74, 65, 95, 255);
 
 	ImVec4 hidden = ImColor(0.f, 0.f, 0.f, 0.0001f);
+
 	ImVec4 text = ImColor(255, 255, 255, 255);
+	ImVec4 text_inactive = ImColor(255, 255, 255, 175);
 
 	// cheat status
 	ImVec4 status_undetected = ImColor(0, 215, 0, 255);
@@ -40,7 +42,7 @@ namespace menu {
 
 	int tabs = 5;				// [aimbot, visuals, misc, skins, configs]
 	int selectedTab = 0;		// switch-statement
-	float tabSpacing = 2.f;		// spacing between tabs
+	float tabSpacing = 0.f;		// spacing between tabs
 	
 	namespace sizes {
 		ImVec2 main_menu = ImVec2(600.f, 500.f);		// main-menu

@@ -196,15 +196,20 @@ void menu::widgets::MainMenu() {
     ImGui::PushFont(menu::fonts::titleFont); // apply title font
 
     ImGui::SetNextWindowSize(menu::sizes::main_menu);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
+    //ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.f, 8.f));
+    //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 0.f));
     if (ImGui::Begin("CLUES - Counter-Strike: Global Offensive", 0, menu::flags::main_menu)) {
-        ImGui::PopStyleVar();
+        //ImGui::PopStyleVar(2);
         
         menu::main_menu_position = ImGui::GetWindowPos(); // grab window position
         
         ImGui::PushFont(menu::fonts::defaultFont); // apply default font
 
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+        //ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.f, 0.f));
         menu::navbar::TabNavigation();
+        ImGui::PopStyleVar();
+
         menu::navbar::TabContent();
 
         ImGui::PopFont(); // default font
@@ -249,6 +254,7 @@ void menu::widgets::InitBottomBar() {
     ImGui::SetNextWindowSize(menu::sizes::bottom_bar);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 505.f));
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, colors::dark_purple);
     if (ImGui::Begin("Version 1 - By MrClue", 0, menu::flags::bottom_bar)) {
 
         ImGui::Text("Status: ");
@@ -260,7 +266,7 @@ void menu::widgets::InitBottomBar() {
         ImGui::Text(".");
 
     } ImGui::End();
-
+    ImGui::PopStyleColor();
     ImGui::PopFont();
 }
 
@@ -272,6 +278,7 @@ void menu::navbar::TabNavigation() {
         float tabSizeY = ImGui::GetContentRegionAvail().y;
 
         ImGui::PushStyleColor(ImGuiCol_Button, menu::selectedTab == 0 ? colors::button_active : colors::button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, menu::selectedTab == 0 ? colors::text : colors::text_inactive);
         if (ImGui::Button("Aimbot", ImVec2(tabSizeX, tabSizeY))) {
             menu::selectedTab = 0;
         }
@@ -279,6 +286,7 @@ void menu::navbar::TabNavigation() {
         ImGui::SameLine(0.f, menu::tabSpacing);
 
         ImGui::PushStyleColor(ImGuiCol_Button, menu::selectedTab == 1 ? colors::button_active : colors::button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, menu::selectedTab == 1 ? colors::text : colors::text_inactive);
         if (ImGui::Button("Visuals", ImVec2(tabSizeX, tabSizeY))) {
             menu::selectedTab = 1;
         }
@@ -286,6 +294,7 @@ void menu::navbar::TabNavigation() {
         ImGui::SameLine(0.f, menu::tabSpacing);
 
         ImGui::PushStyleColor(ImGuiCol_Button, menu::selectedTab == 2 ? colors::button_active : colors::button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, menu::selectedTab == 2 ? colors::text : colors::text_inactive);
         if (ImGui::Button("Misc", ImVec2(tabSizeX, tabSizeY))) {
             menu::selectedTab = 2;
         }
@@ -293,6 +302,7 @@ void menu::navbar::TabNavigation() {
         ImGui::SameLine(0.f, menu::tabSpacing);
 
         ImGui::PushStyleColor(ImGuiCol_Button, menu::selectedTab == 3 ? colors::button_active : colors::button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, menu::selectedTab == 3 ? colors::text : colors::text_inactive);
         if (ImGui::Button("Skins", ImVec2(tabSizeX, tabSizeY))) {
             menu::selectedTab = 3;
         }
@@ -300,17 +310,19 @@ void menu::navbar::TabNavigation() {
         ImGui::SameLine(0.f, menu::tabSpacing);
 
         ImGui::PushStyleColor(ImGuiCol_Button, menu::selectedTab == 4 ? colors::button_active : colors::button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, menu::selectedTab == 4 ? colors::text : colors::text_inactive);
         if (ImGui::Button("Configs", ImVec2(tabSizeX, tabSizeY))) {
             menu::selectedTab = 4;
         }
 
-        ImGui::PopStyleColor(5); // for each tab
+        ImGui::PopStyleColor(10); // for each tab
 
     } ImGui::EndChild();
     ImGui::PopStyleColor(); // for child: ##tabs
 }
 
 void menu::navbar::TabContent() {
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(8.0f, 4.0f));
     ImGui::PushStyleColor(ImGuiCol_Border, colors::border);
     if (ImGui::BeginChild("##ActiveTab", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), true)) {
         switch (menu::selectedTab)
@@ -333,10 +345,14 @@ void menu::navbar::TabContent() {
         }
 
     } ImGui::EndChild();
-    ImGui::PopStyleColor(); // for child: ##ActiveTab
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
 }
 
 void menu::init_tab::AimbotTab() {
+ 
+    ImGui::BeginGroupPanel("settings", ImVec2(-1.f, -1.f));
+
     ImGui::Checkbox("Enable Aimbot", &settings::aimbot::enable_aimbot);
     ImGui::SliderFloat("FOV", &settings::aimbot::fov, 0.f, 100.f, "%.1f");
     ImGui::SliderFloat("Speed", &settings::aimbot::speed, 0.f, 100.f, "%.1f");
@@ -349,37 +365,106 @@ void menu::init_tab::AimbotTab() {
 
         ImGui::EndCombo();
     }
+
+    ImGui::EndGroupPanel(); // settings
+
+    ImGui::BeginGroupPanel("extra");
+
+    ImGui::Checkbox("Target In Air", &settings::aimbot::misc::target_in_air);
+    ImGui::Checkbox("Target In Smoke", &settings::aimbot::misc::target_in_smoke);
+    ImGui::Checkbox("Auto Pistol", &settings::aimbot::misc::auto_pistol);
+
+    ImGui::EndGroupPanel(); // extra
+
+
 }
 
 void menu::init_tab::VisualsTab() {
-    ImGui::Columns(2);
+    auto contentX = ImGui::GetContentRegionAvail().x * 0.486f; // almost perfect lmao
+    auto contentY = ImGui::GetContentRegionAvail().y;
 
-    ImGui::Button("Dummy 1");
-    ImGui::Button("Dummy 2");
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::light_purple);
 
-    ImGui::NextColumn();
+    if (ImGui::BeginChild("##left", ImVec2(contentX, contentY), true)) {
 
-    ImGui::Button("Dummy 3");
-    ImGui::Button("Dummy 4");
+        if (ImGui::BeginTabBar("esp_preview")) {
+
+            if (ImGui::BeginTabItem("Enemy")) {
+                ImGui::Text("Fuck off");
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Friendly")) {
+                ImGui::Text("Fuck");
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Local")) {
+                ImGui::Text("Fuck you");
+
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+    } ImGui::EndChild();
+
+    {
+        ImGui::SameLine(0);
+        ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+        ImGui::SameLine(0);
+    }
+
+    if (ImGui::BeginChild("##right", ImVec2(contentX, contentY / 2), true)) {
+        
+
+        ImGui::Checkbox("Enable ESP", &settings::visuals::esp::enable_esp);
+        ImGui::Checkbox("name_esp", &settings::visuals::esp::name_esp);
+        ImGui::Checkbox("health_esp", &settings::visuals::esp::health_esp);
+        ImGui::Checkbox("armor_esp", &settings::visuals::esp::armor_esp);
+        ImGui::Checkbox("box_esp", &settings::visuals::esp::box_esp);
+        
+        ImGui::Checkbox("enable_chams", &settings::visuals::chams::enable_chams);
+        ImGui::Checkbox("enable_glow    ", &settings::visuals::glow::enable_glow);
+        ImGui::Checkbox("Target In Air", &settings::aimbot::misc::target_in_air);
+        ImGui::Checkbox("Target In Air", &settings::aimbot::misc::target_in_air);
+
+
+    } ImGui::EndChild();
+
+    if (ImGui::BeginChild("##chams", ImVec2(contentX, contentY / 2), true)) {
+
+        ImGui::Text("Child -> MOVE U BITCH");
+        
+
+
+    } ImGui::EndChild();
+
+    ImGui::PopStyleColor();
+
 }
 
 void menu::init_tab::MiscTab() {
-    if (ImGui::BeginChild(1, ImVec2(100.f, 100.f))) {
+    ImGui::BeginGroupPanel("Test", ImVec2(-1.0f, -1.0f));
         ImGui::Checkbox("Enable Bhop", &settings::misc::enable_bhop);
         ImGui::Button("Dummy 2");
 
-        ImGui::EndChild();
-    }
-
-    if (ImGui::BeginChild(2, ImVec2(100.f, 100.f))) {
-        ImGui::Button("Dummy 3");
-        ImGui::Button("Dummy 4");
-
-        ImGui::EndChild();
-    }
+    ImGui::EndGroupPanel();
+    
 }
 
 void menu::init_tab::SkinsTab() {
+
+    if (ImGui::BeginChild("Test", ImVec2(100.f, 100.f))) {
+        ImGui::Checkbox("Enable Skins", &settings::skins::enable_skinchanger);
+        ImGui::Button("Dummy");
+        
+    }ImGui::EndChild();
+    
+    
 
 }
 
@@ -404,17 +489,17 @@ void menu::themes::MenuTheme() {
 
     // title bar
     style.WindowTitleAlign = ImVec2(0.5, 0.5);
-    colors[ImGuiCol_TitleBg] = colors::main;
-    colors[ImGuiCol_TitleBgActive] = colors::main;
-    colors[ImGuiCol_TitleBgCollapsed] = colors::main_less_alpha;
+    colors[ImGuiCol_TitleBg] = colors::light_purple;
+    colors[ImGuiCol_TitleBgActive] = colors::light_purple;
+    colors[ImGuiCol_TitleBgCollapsed] = colors::light_purple_reduced_alpha;
 
     // border
-    style.WindowBorderSize = 2.0f;
-    colors[ImGuiCol_Border] = colors::main;
+    style.WindowBorderSize = 1.0f;
+    colors[ImGuiCol_Border] = colors::light_purple;
 
     // window backgrounds
-    colors[ImGuiCol_WindowBg] = colors::secondary;
-    colors[ImGuiCol_ChildBg] = colors::main;
+    colors[ImGuiCol_WindowBg] = colors::light_purple;
+    colors[ImGuiCol_ChildBg] = colors::dark_purple;
 
     // text
     colors[ImGuiCol_Text] = colors::text;
@@ -439,19 +524,32 @@ void menu::themes::MenuTheme() {
     colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
     colors[ImGuiCol_FrameBgHovered] = ImColor(218, 83, 95, 62);
     colors[ImGuiCol_FrameBgActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.24f);
-    style.FrameRounding = 2;
+    style.FrameRounding = 2.f;
+    style.FramePadding = ImVec2(4.f, 4.f);
 
     // sliders
-    style.GrabMinSize = 10;
-    style.GrabRounding = 2;
+    style.GrabMinSize = 10.f;
+    style.GrabRounding = 2.f;
     colors[ImGuiCol_SliderGrab] = ImVec4(0.85f, 0.33f, 0.37f, 0.59f);
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
 
     // scrollbar
-    style.ScrollbarSize = 10;
+    style.ScrollbarSize = 10.f;
     colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.85f, 0.33f, 0.37f, 0.59f);
     colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
     colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+
+    // seperator
+    colors[ImGuiCol_Separator] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+    
+    // tabs
+    style.TabBorderSize = 1.f;
+    style.TabRounding = 2.f;
+    colors[ImGuiCol_Tab] = ImVec4(0.12f, 0.08f, 0.18f, 1.00f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.16f, 0.12f, 0.22f, 1.00f);
+    
+
+
 
     // load fonts
     menu::themes::MenuFonts();
@@ -460,7 +558,7 @@ void menu::themes::MenuTheme() {
 void menu::render::RenderMenu() {
     // ImGui demo window
     //ImGui::ShowDemoWindow();
-    //ImGui::ShowStyleEditor();
+    ImGui::ShowStyleEditor();
 
     // window: main menu
     menu::widgets::MainMenu();
