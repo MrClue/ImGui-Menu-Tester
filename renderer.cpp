@@ -558,7 +558,7 @@ void menu::themes::MenuTheme() {
 void menu::render::RenderMenu() {
     // ImGui demo window
     //ImGui::ShowDemoWindow();
-    ImGui::ShowStyleEditor();
+    //ImGui::ShowStyleEditor();
 
     // window: main menu
     menu::widgets::MainMenu();
