@@ -44,6 +44,9 @@ namespace menu {
 	int selectedTab = 0;		// switch-statement
 	float tabSpacing = 0.f;		// spacing between tabs
 	
+	int preview_tabs = 3;
+	int selected_prev_tab = 0;
+
 	namespace sizes {
 		ImVec2 main_menu = ImVec2(600.f, 500.f);		// main-menu
 		ImVec2 click_to_show = ImVec2(600.f, 50.f);		// "click" button

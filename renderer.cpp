@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "settings.h"
+#include <vector>
 
 static ID3D11Device           * g_pd3dDevice           = nullptr;
 static ID3D11DeviceContext    * g_pd3dDeviceContext    = nullptr;
@@ -106,7 +107,6 @@ int StartRendering( )
 
     return 0;
 }
-
 
 bool CreateDeviceD3D( HWND hWnd )
 {
@@ -254,6 +254,7 @@ void menu::widgets::InitBottomBar() {
     ImGui::SetNextWindowSize(menu::sizes::bottom_bar);
     ImGui::SetNextWindowPos(ImVec2(menu::main_menu_position.x, menu::main_menu_position.y + 505.f));
 
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5, 0.5));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, colors::dark_purple);
     if (ImGui::Begin("Version 1 - By MrClue", 0, menu::flags::bottom_bar)) {
 
@@ -267,6 +268,8 @@ void menu::widgets::InitBottomBar() {
 
     } ImGui::End();
     ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+
     ImGui::PopFont();
 }
 
@@ -385,59 +388,195 @@ void menu::init_tab::VisualsTab() {
 
     ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::light_purple);
 
-    if (ImGui::BeginChild("##left", ImVec2(contentX, contentY), true)) {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+    if (ImGui::BeginChild("PREVIEW_TAB", ImVec2(contentX, contentY), true)) {
+       
+        //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+        if (ImGui::BeginChild("PREV_TAB_BAR", ImVec2(ImGui::GetContentRegionAvail().x, 30.f), true)) {
+            float tabSizeX = (ImGui::GetContentRegionAvail().x / 3.f);
+            float tabSizeY = ImGui::GetContentRegionAvail().y;
 
-        if (ImGui::BeginTabBar("esp_preview")) {
-
-            if (ImGui::BeginTabItem("Enemy")) {
-                ImGui::Text("Fuck off");
-
-                ImGui::EndTabItem();
+            ImGui::PushStyleColor(ImGuiCol_Button, menu::selected_prev_tab == 0 ? colors::button_active : colors::button_inactive);
+            ImGui::PushStyleColor(ImGuiCol_Text, menu::selected_prev_tab == 0 ? colors::text : colors::text_inactive);
+            if (ImGui::Button("Enemy", ImVec2(tabSizeX, 30.f))) {
+                menu::selected_prev_tab = 0;
             }
+            ImGui::PopStyleColor(2);
 
-            if (ImGui::BeginTabItem("Friendly")) {
-                ImGui::Text("Fuck");
-
-                ImGui::EndTabItem();
+            ImGui::SameLine(0.f, 0.f);
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, menu::selected_prev_tab == 1 ? colors::button_active : colors::button_inactive);
+            ImGui::PushStyleColor(ImGuiCol_Text, menu::selected_prev_tab == 1 ? colors::text : colors::text_inactive);
+            if (ImGui::Button("Friendly", ImVec2(tabSizeX, 30.f))) {
+                menu::selected_prev_tab = 1;
             }
+            ImGui::PopStyleColor(2);
 
-            if (ImGui::BeginTabItem("Local")) {
-                ImGui::Text("Fuck you");
+            ImGui::SameLine(0.f, 0.f);
 
-                ImGui::EndTabItem();
+            ImGui::PushStyleColor(ImGuiCol_Button, menu::selected_prev_tab == 2 ? colors::button_active : colors::button_inactive);
+            ImGui::PushStyleColor(ImGuiCol_Text, menu::selected_prev_tab == 2 ? colors::text : colors::text_inactive);
+            if (ImGui::Button("Local", ImVec2(tabSizeX, 30.f))) {
+                menu::selected_prev_tab = 2;
             }
+            ImGui::PopStyleColor(2);
 
-            ImGui::EndTabBar();
+        } ImGui::EndChild();
+        //ImGui::PopStyleVar();
+        
+        // restore padding & render the rest
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f));
+
+        // esp preview logic
+
+        std::vector<std::pair<std::string, ImColor>> flags_vector;
+        ImVec2 p = ImGui::GetCursorScreenPos();
+        ImColor c = ImColor(32, 114, 247);
+        const auto cur_window = ImGui::GetCurrentWindow();
+        const ImVec2 w_pos = cur_window->Pos;
+        auto position = 51;
+
+        int box_w = 210;
+        int box_h = 320;
+
+        auto pY = 25; // extra y padding
+
+        //box
+        if (settings::visuals::esp::box_esp)
+            cur_window->DrawList->AddRect(ImVec2(w_pos.x + 72, w_pos.y + 55+pY), ImVec2(w_pos.x + box_w, w_pos.y + box_h), ImGui::GetColorU32(ImGuiCol_Text));
+
+        //hp
+        if (settings::visuals::esp::health_esp)
+            cur_window->DrawList->AddRectFilled(ImVec2(w_pos.x + 69, w_pos.y + 55 + pY), ImVec2(w_pos.x + 71, w_pos.y + box_h), ImGui::GetColorU32(ImVec4(83 / 255.f, 200 / 255.f, 84 / 255.f, 255 / 255.f)));
+
+        //armor
+        if (settings::visuals::esp::armor_esp)
+            cur_window->DrawList->AddRectFilled(ImVec2(w_pos.x + 72, w_pos.y + box_h + 3), ImVec2(w_pos.x + 210, w_pos.y + box_h + 1), ImGui::GetColorU32(ImVec4(0 / 255.f, 80 / 255.f, 255 / 255.f, 255 / 255.f)));
+
+        //name
+        if (settings::visuals::esp::name_esp)
+            cur_window->DrawList->AddText(ImVec2(w_pos.x + 130, w_pos.y + 39 + pY), ImGui::GetColorU32(ImGuiCol_Text), ("name"));
+
+        //weapon
+        if (settings::visuals::esp::weapon_esp)
+            cur_window->DrawList->AddText(ImVec2(w_pos.x + 123/*125*/, w_pos.y + box_h + 1), ImGui::GetColorU32(ImGuiCol_Text), ("weapon"));
+
+        if (settings::visuals::esp::esp_flags[0])
+            flags_vector.push_back(std::pair<std::string, ImColor>(("bot"), ImColor(255, 0, 0)));
+
+        if (settings::visuals::esp::esp_flags[1])
+            flags_vector.push_back(std::pair<std::string, ImColor>(("hk"), ImColor(255, 255, 255)));
+
+        if (settings::visuals::esp::esp_flags[2])
+            flags_vector.push_back(std::pair<std::string, ImColor>(std::string(("$16000")), ImColor(120, 180, 10)));
+
+        if (settings::visuals::esp::esp_flags[3])
+            flags_vector.push_back(std::pair<std::string, ImColor>(std::string(("zoom")), ImColor(80, 160, 200, 255)));
+
+        if (settings::visuals::esp::esp_flags[4])
+            flags_vector.push_back(std::pair<std::string, ImColor>(std::string(("flashed")), ImColor(255, 255, 255)));
+
+        if (settings::visuals::esp::esp_flags[5])
+            flags_vector.push_back(std::pair<std::string, ImColor>(std::string(("desync")), ImColor(255, 0, 0)));
+
+        if (settings::visuals::esp::esp_flags[6])
+            flags_vector.push_back(std::pair<std::string, ImColor>(std::string(("defusing")), ImColor(247, 202, 24)));
+
+        for (auto text : flags_vector) {
+            cur_window->DrawList->AddText(ImVec2(w_pos.x + box_w + 2, w_pos.y + position + pY), ImColor(text.second), text.first.c_str());
+            position += 10;
         }
 
+        ImGui::PopStyleVar();
+
+
     } ImGui::EndChild();
+    ImGui::PopStyleVar();
 
     {
         ImGui::SameLine(0);
+        //ImGui::PushStyleColor(ImGuiCol_Separator, colors::hidden);
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+        //ImGui::PopStyleColor();
         ImGui::SameLine(0);
     }
 
-    if (ImGui::BeginChild("##right", ImVec2(contentX, contentY / 2), true)) {
+    if (ImGui::BeginChild("ESP_TAB", ImVec2(contentX, (contentY / 2.f) - 2.f), true)) {
+        static const char* flags[7] = { "bot", "armor", "money", "scoped", "flashed", "desync", "defusing" };
+        static std::string flPreviewVal = "";
         
-
+        {
+            ImGui::Text("ESP / GLOW");
+            ImGui::Separator();
+            ImGui::Spacing();
+        }
+        
         ImGui::Checkbox("Enable ESP", &settings::visuals::esp::enable_esp);
-        ImGui::Checkbox("name_esp", &settings::visuals::esp::name_esp);
-        ImGui::Checkbox("health_esp", &settings::visuals::esp::health_esp);
-        ImGui::Checkbox("armor_esp", &settings::visuals::esp::armor_esp);
-        ImGui::Checkbox("box_esp", &settings::visuals::esp::box_esp);
-        
-        ImGui::Checkbox("enable_chams", &settings::visuals::chams::enable_chams);
-        ImGui::Checkbox("enable_glow    ", &settings::visuals::glow::enable_glow);
-        ImGui::Checkbox("Target In Air", &settings::aimbot::misc::target_in_air);
-        ImGui::Checkbox("Target In Air", &settings::aimbot::misc::target_in_air);
+        // esp options
+        if (settings::visuals::esp::enable_esp) {
+            ImGui::SetCursorPosX(20.f);
+            ImGui::Checkbox("Name", &settings::visuals::esp::name_esp);
+            ImGui::SetCursorPosX(20.f);
+            ImGui::Checkbox("Health", &settings::visuals::esp::health_esp);
+            ImGui::SetCursorPosX(20.f);
+            ImGui::Checkbox("Armor", &settings::visuals::esp::armor_esp);
+            ImGui::SetCursorPosX(20.f);
+            ImGui::Checkbox("Weapon", &settings::visuals::esp::weapon_esp);
+            ImGui::SetCursorPosX(20.f);
+            ImGui::Checkbox("Box", &settings::visuals::esp::box_esp);
+            ImGui::SetCursorPosX(20.f);
+            
+            // todo: lav combo om til simpel funktion
+            if (ImGui::BeginCombo("flags", flPreviewVal.c_str())) {
+                flPreviewVal = "";
+                std::vector<std::string> vec;
 
+                for (size_t i = 0; i < IM_ARRAYSIZE(flags); i++)
+                {
+                    ImGui::Selectable(flags[i], &settings::visuals::esp::esp_flags[i], ImGuiSelectableFlags_DontClosePopups);
+
+                    if (settings::visuals::esp::esp_flags[i]) {
+                        vec.push_back(flags[i]);
+                    }
+                    
+                }
+
+                for (size_t i = 0; i < vec.size(); i++)
+                {
+                    if (vec.size() == 1)
+                        flPreviewVal += vec.at(i);
+                    else if (!(i == vec.size() - 1))
+                        flPreviewVal += vec.at(i) + ", ";
+                    else
+                        flPreviewVal += vec.at(i);
+                }
+
+                ImGui::EndCombo();
+            }
+            
+        }
+        
+        ImGui::Checkbox("Enable Glow", &settings::visuals::glow::enable_glow);
+        // glow options
+        if (settings::visuals::glow::enable_glow) {
+            
+
+        }
+        
 
     } ImGui::EndChild();
 
-    if (ImGui::BeginChild("##chams", ImVec2(contentX, contentY / 2), true)) {
+    ImGui::SetCursorPos(ImVec2(contentX * 1.09f, (contentY / 2.f) + 10.f)); // stack under ESP_TAB --> feels ghetto tbh
 
-        ImGui::Text("Child -> MOVE U BITCH");
+    if (ImGui::BeginChild("CHAMS_TAB", ImVec2(contentX, (contentY / 2.f) - 2.f), true)) {
+        
+        {
+            ImGui::Text("CHAMS / OTHER");
+            ImGui::Separator();
+            ImGui::Spacing();
+        }
+
+        ImGui::Checkbox("Enable Chams", &settings::visuals::chams::enable_chams);
         
 
 
@@ -488,7 +627,7 @@ void menu::themes::MenuTheme() {
     auto colors = style.Colors;
 
     // title bar
-    style.WindowTitleAlign = ImVec2(0.5, 0.5);
+    style.WindowTitleAlign = ImVec2(0.5, 1.0); // mid-bot
     colors[ImGuiCol_TitleBg] = colors::light_purple;
     colors[ImGuiCol_TitleBgActive] = colors::light_purple;
     colors[ImGuiCol_TitleBgCollapsed] = colors::light_purple_reduced_alpha;
@@ -518,7 +657,8 @@ void menu::themes::MenuTheme() {
     colors[ImGuiCol_HeaderActive] = ImColor(218, 83, 95, 143);
 
     // popup
-    colors[ImGuiCol_PopupBg] = ImColor(218, 83, 95, 27);
+    //colors[ImGuiCol_PopupBg] = ImColor(218, 83, 95, 27);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.08f, 0.18f, 1.00f);
 
     // frame
     colors[ImGuiCol_FrameBg] = ImColor(218, 83, 95, 27);
@@ -534,13 +674,16 @@ void menu::themes::MenuTheme() {
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
 
     // scrollbar
-    style.ScrollbarSize = 10.f;
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.85f, 0.33f, 0.37f, 0.59f);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+    style.ScrollbarSize = 9.f;
+    style.ScrollbarRounding = 12.f;
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.00f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.25f, 0.21f, 0.34f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.25f, 0.21f, 0.34f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.25f, 0.21f, 0.34f, 1.00f);
 
     // seperator
-    colors[ImGuiCol_Separator] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+    //colors[ImGuiCol_Separator] = ImVec4(0.85f, 0.33f, 0.37f, 0.73f);
+    colors[ImGuiCol_Separator] = ImVec4(0.25f, 0.21f, 0.34f, 1.00f);
     
     // tabs
     style.TabBorderSize = 1.f;
@@ -548,9 +691,6 @@ void menu::themes::MenuTheme() {
     colors[ImGuiCol_Tab] = ImVec4(0.12f, 0.08f, 0.18f, 1.00f);
     colors[ImGuiCol_TabActive] = ImVec4(0.16f, 0.12f, 0.22f, 1.00f);
     
-
-
-
     // load fonts
     menu::themes::MenuFonts();
 }
@@ -571,5 +711,4 @@ void menu::render::RenderMenu() {
         menu::widgets::InitBottomBar();
     }
 }
-
 

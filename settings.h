@@ -28,6 +28,8 @@ namespace settings {
 			bool name_esp = false;
 			bool health_esp = false;
 			bool armor_esp = false;
+			bool weapon_esp = false;
+			inline bool esp_flags[7] = { false, false, false, false, false, false, false }; // todo
 			bool box_esp = false;
 			float box_esp_visible_color[4] = { 255 / 255.f, 255 / 255.f , 255 / 255.f, 1.0f };
 			float box_esp_hidden_color[4] = { 255 / 255.f, 255 / 255.f , 255 / 255.f, 1.0f };
