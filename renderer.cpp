@@ -383,13 +383,17 @@ void menu::init_tab::AimbotTab() {
 }
 
 void menu::init_tab::VisualsTab() {
-    auto contentX = ImGui::GetContentRegionAvail().x * 0.486f; // almost perfect lmao
-    auto contentY = ImGui::GetContentRegionAvail().y;
+
+    /* TODO
+    * Fix with for each side -> find out seperator + each side spacing width -> contentX = (GetContentRegionAvail().x - seperatorTotalX) / 2
+    */
+
+    auto contentX = (ImGui::GetContentRegionAvail().x - 18.f) / 2.f; // almost perfect lmao
 
     ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::light_purple);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
-    if (ImGui::BeginChild("PREVIEW_TAB", ImVec2(contentX, contentY), true)) {
+    if (ImGui::BeginChild("PREVIEW_TAB", ImVec2(contentX, ImGui::GetContentRegionAvail().y), true)) {
        
         //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
         if (ImGui::BeginChild("PREV_TAB_BAR", ImVec2(ImGui::GetContentRegionAvail().x, 30.f), true)) {
@@ -407,7 +411,7 @@ void menu::init_tab::VisualsTab() {
             
             ImGui::PushStyleColor(ImGuiCol_Button, menu::selected_prev_tab == 1 ? colors::button_active : colors::button_inactive);
             ImGui::PushStyleColor(ImGuiCol_Text, menu::selected_prev_tab == 1 ? colors::text : colors::text_inactive);
-            if (ImGui::Button("Friendly", ImVec2(tabSizeX, 30.f))) {
+            if (ImGui::Button("Friendly", ImVec2(tabSizeX, 30.f))) {    
                 menu::selected_prev_tab = 1;
             }
             ImGui::PopStyleColor(2);
@@ -489,30 +493,33 @@ void menu::init_tab::VisualsTab() {
 
         ImGui::PopStyleVar();
 
-
     } ImGui::EndChild();
     ImGui::PopStyleVar();
 
+    // seperator
     {
-        ImGui::SameLine(0);
-        //ImGui::PushStyleColor(ImGuiCol_Separator, colors::hidden);
+        ImGui::SameLine(0.f);
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
-        //ImGui::PopStyleColor();
-        ImGui::SameLine(0);
+        ImGui::SameLine(0.f);
     }
 
-    if (ImGui::BeginChild("ESP_TAB", ImVec2(contentX, (contentY / 2.f) - 2.f), true)) {
+    custom::BeginFeatureTab("ESP / GLOW / CHAMS", ImVec2(ImGui::GetContentRegionAvail().x, 30.f));
+
+    if (ImGui::BeginChild("ESP_TAB", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), true)) {
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.f, 4.f));
+
         static const char* flags[7] = { "bot", "armor", "money", "scoped", "flashed", "desync", "defusing" };
         static std::string flPreviewVal = "";
         
+        // ESP
         {
-            ImGui::Text("ESP / GLOW");
+            ImGui::Text("ESP");
             ImGui::Separator();
             ImGui::Spacing();
         }
         
         ImGui::Checkbox("Enable ESP", &settings::visuals::esp::enable_esp);
-        // esp options
         if (settings::visuals::esp::enable_esp) {
             ImGui::SetCursorPosX(20.f);
             ImGui::Checkbox("Name", &settings::visuals::esp::name_esp);
@@ -556,42 +563,78 @@ void menu::init_tab::VisualsTab() {
             
         }
         
+        // GLOW
+        {
+            ImGui::Text("GLOW");
+            ImGui::Separator();
+            ImGui::Spacing();
+        }
+
         ImGui::Checkbox("Enable Glow", &settings::visuals::glow::enable_glow);
-        // glow options
         if (settings::visuals::glow::enable_glow) {
             
+            for (size_t i = 0; i < 5; i++)
+            {
+                ImGui::Text("...");
+            }
 
         }
-        
 
-    } ImGui::EndChild();
-
-    ImGui::SetCursorPos(ImVec2(contentX * 1.09f, (contentY / 2.f) + 10.f)); // stack under ESP_TAB --> feels ghetto tbh
-
-    if (ImGui::BeginChild("CHAMS_TAB", ImVec2(contentX, (contentY / 2.f) - 2.f), true)) {
-        
+        // CHAMS
         {
-            ImGui::Text("CHAMS / OTHER");
+            ImGui::Text("CHAMS");
             ImGui::Separator();
             ImGui::Spacing();
         }
 
         ImGui::Checkbox("Enable Chams", &settings::visuals::chams::enable_chams);
+        if (settings::visuals::chams::enable_chams) {
+            for (size_t i = 0; i < 5; i++)
+            {
+                ImGui::Text("...");
+            }
+        }
         
-
+        ImGui::PopStyleVar(); //ImGuiStyleVar_ItemSpacing
 
     } ImGui::EndChild();
 
+    custom::EndFeatureTab();
+   
     ImGui::PopStyleColor();
-
 }
 
 void menu::init_tab::MiscTab() {
-    ImGui::BeginGroupPanel("Test", ImVec2(-1.0f, -1.0f));
-        ImGui::Checkbox("Enable Bhop", &settings::misc::enable_bhop);
-        ImGui::Button("Dummy 2");
+    
+    custom::BeginFeatureTab("Tab 1", ImVec2(ImGui::GetContentRegionAvail().x / 2, 30.f));
+    if (ImGui::BeginChild("#tab1", ImVec2(ImGui::GetContentRegionAvail().x / 2, ImGui::GetContentRegionAvail().y), true)) {
+        
+        for (size_t i = 0; i < 20; i++)
+        {
+            ImGui::Text("Hello, Word!");
+        }
 
-    ImGui::EndGroupPanel();
+        ImGui::EndChild();
+    }
+    custom::EndFeatureTab();
+
+    {
+        ImGui::SameLine(0);
+        ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+        ImGui::SameLine(0);
+    }
+    
+    custom::BeginFeatureTab("Tab 2", ImVec2(ImGui::GetContentRegionAvail().x, 30.f));
+    if (ImGui::BeginChild("#tab2", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2), true)) {
+
+        for (size_t i = 0; i < 20; i++)
+        {
+            ImGui::Text("Hello, Word!");
+        }
+
+        ImGui::EndChild();
+    }
+    custom::EndFeatureTab();
     
 }
 
@@ -698,7 +741,7 @@ void menu::themes::MenuTheme() {
 void menu::render::RenderMenu() {
     // ImGui demo window
     //ImGui::ShowDemoWindow();
-    //ImGui::ShowStyleEditor();
+    ImGui::ShowStyleEditor();
 
     // window: main menu
     menu::widgets::MainMenu();
@@ -712,3 +755,34 @@ void menu::render::RenderMenu() {
     }
 }
 
+void custom::BeginFeatureTab(const char* label, const ImVec2& size_arg) {
+    /* USAGE GUIDE
+    * 1st:  BeginFeatureTab()
+    * 2nd:  BeginChild()
+    * 3rd:  EndFeatureTab();
+    */
+    ImGui::BeginGroup();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.f, -0.1f));
+
+    ImGui::PushStyleColor(ImGuiCol_Button, colors::button_inactive);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, colors::button_inactive);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colors::button_inactive);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.f);
+
+    ImGui::Button(label, size_arg);
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopStyleColor(3);
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::light_purple);
+}
+
+void custom::EndFeatureTab() {
+    ImGui::PopStyleVar(); // ImGuiStyleVar_ItemSpacing
+    ImGui::PopStyleColor();
+
+    ImGui::EndGroup();
+}

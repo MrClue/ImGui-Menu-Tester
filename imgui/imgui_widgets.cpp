@@ -1080,9 +1080,10 @@ bool ImGui::Checkbox(const char* label, bool* v)
     const ImGuiID id = window->GetID(label);
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
 
-    const float square_sz = GetFrameHeight();
+    const float square_sz = GetFrameHeight() * 0.75f;
     const ImVec2 pos = window->DC.CursorPos;
-    const ImRect total_bb(pos, pos + ImVec2(square_sz + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y * 2.0f));
+    const ImRect total_bb(pos, pos + ImVec2(square_sz + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y));
+
     ItemSize(total_bb, style.FramePadding.y);
     if (!ItemAdd(total_bb, id))
     {
@@ -1116,7 +1117,7 @@ bool ImGui::Checkbox(const char* label, bool* v)
         RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(pad, pad), check_col, square_sz - pad * 2.0f);
     }
 
-    ImVec2 label_pos = ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y);
+    ImVec2 label_pos = ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y /*+ (style.FramePadding.y * 0.5f)*/);
     if (g.LogEnabled)
         LogRenderedText(&label_pos, mixed_value ? "[~]" : *v ? "[x]" : "[ ]");
     if (label_size.x > 0.0f)

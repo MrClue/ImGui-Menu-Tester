@@ -93,3 +93,9 @@ namespace menu {
 	}
 
 }
+
+namespace custom {
+
+	void BeginFeatureTab(const char* label, const ImVec2& size_arg);
+	void EndFeatureTab();
+}
